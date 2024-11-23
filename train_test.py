@@ -7,7 +7,7 @@ from pkd.core import BasePatchKD
 from pkd.data_loader import IncrementalReIDLoaders
 from pkd.visualization import visualize, Logger, VisdomPlotLogger, VisdomFeatureMapsLogger
 from pkd.operation import train_p_s_an_epoch, fast_test_p_s
-
+from tqdm import tqdm
 
 def main(config):
     set_random_seed(config.seed)
@@ -31,15 +31,23 @@ def main(config):
         # automatically resume model from the latest one
         if config.auto_resume_training_from_lastest_steps:
             start_train_step, start_train_epoch = base.resume_last_model()
+            print(f'Auto resume from step {start_train_step}, epoch {start_train_epoch}')
+            print(f'Loader step {loaders.total_step}')
+        else:
+            start_train_step, start_train_epoch = 0, 0
         # continual loop
-        for current_step in range(start_train_step, loaders.total_step):
+        for current_step in (range(start_train_step, loaders.total_step)):
             current_total_train_epochs = config.total_continual_train_epochs if current_step > 0 else config.total_train_epochs
+            print('Total epoch for current step:', current_total_train_epochs)
+            start_train_epoch = 0 if current_step > 0 else start_train_epoch
+            print('Start training from epoch:', start_train_epoch)
             if current_step > 0:
                 logger(f'save_and_frozen old model in {current_step}')
                 old_model = base.copy_model_and_frozen(model_name='tasknet')
             else:
                 old_model = None
-            for current_epoch in range(start_train_epoch, current_total_train_epochs):
+            current_epoch = 0
+            for current_epoch in tqdm(range(start_train_epoch, current_total_train_epochs)):
                 result_dict = {}
                 # save model
                 base.save_model(current_step, current_epoch)
@@ -122,10 +130,10 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--fp_16', type=bool, default=True)
     parser.add_argument('--running_time', type=str, default=running_time)
-    parser.add_argument('--visdom', type=bool, default=True)
+    parser.add_argument('--visdom', type=bool, default=False)
     parser.add_argument('--visdom_port', type=int, default=8097)
     parser.add_argument('--cuda', type=str, default='cuda')
-    parser.add_argument('--mode', type=str, default='train', help='trian_10, train_5, train, test or visualize')
+    parser.add_argument('--mode', type=str, default='train', help='train_10, train_5, train, test or visualize')
     parser.add_argument('--output_path', type=str, default=f'results/{running_time}', help='path to save related informations')
     parser.add_argument('--continual_step', type=str, default='5',
                         help='10 or 5 or task')
@@ -139,13 +147,13 @@ if __name__ == '__main__':
                         help='0-10 epoch warmup')
 
     # dataset configuration
-    machine_dataset_path = '/home/r2d2/r2d2/Datasets/'
+    machine_dataset_path = 'data'
     parser.add_argument('--datasets_root', type=str, default=machine_dataset_path, help='mix/market/duke/')
     parser.add_argument('--combine_all', type=ast.literal_eval, default=False, help='train+query+gallery as train')
     parser.add_argument('--train_dataset', nargs='+', type=str,
-                        default=['market', 'subcuhksysu', 'duke', 'msmt17', 'cuhk03'])
+                        default=['market', 'cuhksysu', 'duke', 'cuhk03'])
     parser.add_argument('--test_dataset', nargs='+', type=str,
-                        default=['market', 'subcuhksysu', 'duke', 'cuhk03', 'allgeneralizable'])
+                        default=['market', 'cuhksysu', 'duke', 'cuhk03'])
 
     parser.add_argument('--image_size', type=int, nargs='+', default=[256, 128])
     parser.add_argument('--test_batch_size', type=int, default=64, help='test batch size')
@@ -177,8 +185,8 @@ if __name__ == '__main__':
                         help='new_gamma for the new module learning rate decay')
 
     parser.add_argument('--weight_decay', type=float, default=0.0005)
-    parser.add_argument('--total_train_epochs', type=int, default=50)
-    parser.add_argument('--total_continual_train_epochs', type=int, default=50)
+    parser.add_argument('--total_train_epochs', type=int, default=10)
+    parser.add_argument('--total_continual_train_epochs', type=int, default=10)
 
     # resume and save
     parser.add_argument('--auto_resume_training_from_lastest_steps', type=ast.literal_eval, default=True)
@@ -197,7 +205,7 @@ if __name__ == '__main__':
                         default=True,
                         help='test during train for forgeting')
 
-    parser.add_argument('--resume_test_model', type=str, default='/path/to/pretrained/model',
+    parser.add_argument('--resume_test_model', type=str, default='results/2024-11-19-20-54-01/models/0',
                         help='only available under test model')
     parser.add_argument('--test_mode', type=str, default='all', help='inter-camera, intra-camera, all')
     parser.add_argument('--test_metric', type=str, default='euclidean', help='cosine, euclidean')

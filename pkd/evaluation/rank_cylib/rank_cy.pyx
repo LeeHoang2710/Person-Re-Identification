@@ -23,10 +23,11 @@ Credit to https://github.com/luzai
 # Main interface
 cpdef evaluate_cy(distmat, q_pids, g_pids, q_camids, g_camids, max_rank, use_metric_cuhk03=False):
     distmat = np.asarray(distmat, dtype=np.float32)
-    q_pids = np.asarray(q_pids, dtype=np.int64)
-    g_pids = np.asarray(g_pids, dtype=np.int64)
+    q_pids = np.asarray(q_pids, dtype=np.int32)
+    g_pids = np.asarray(g_pids, dtype=np.int32)
     q_camids = np.asarray(q_camids, dtype=np.int64)
     g_camids = np.asarray(g_camids, dtype=np.int64)
+    max_rank = np.int64(max_rank)
     if use_metric_cuhk03:
         return eval_cuhk03_cy(distmat, q_pids, g_pids, q_camids, g_camids, max_rank)
     return eval_market1501_cy(distmat, q_pids, g_pids, q_camids, g_camids, max_rank)

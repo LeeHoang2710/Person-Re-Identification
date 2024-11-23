@@ -96,9 +96,9 @@ def visualize_ranked_results(distmat, dataset, save_dir='', topk=20, sort='desce
     assert sort in ['descend', 'ascend']
     assert mode in ['intra-camera', 'inter-camera', 'all']
 
-    if sort is 'ascend':
+    if sort == 'ascend':
         indices = np.argsort(distmat, axis=1)
-    elif sort is 'descend':
+    elif sort == 'descend':
         indices = np.argsort(distmat, axis=1)[:, ::-1]
 
     make_dirs(save_dir)

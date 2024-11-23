@@ -4,11 +4,12 @@ easydict
 h5py
 imageio
 matplotlib
-numpy
+numpy<2
 opencv-python
 prettytable
-sklearn
+scikit-learn
 torch
 torchvision
 tqdm
 visdom
+IPython

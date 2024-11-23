@@ -1,6 +1,7 @@
 import numpy as np
 import warnings
 from collections import defaultdict
+from IPython import embed
 
 try:
     from pkd.evaluation.rank_cylib.rank_cy import evaluate_cy
@@ -173,7 +174,7 @@ def fast_evaluate_rank(
     g_camids,
     max_rank=50,
     use_metric_cuhk03=False,
-    use_cython=True
+    use_cython=False
 ):
     """Evaluates CMC rank.
 
@@ -194,13 +195,22 @@ def fast_evaluate_rank(
             This is highly recommended as the cython code can speed up the cmc computation
             by more than 10x. This requires Cython to be installed.
     """
-    if use_cython and IS_CYTHON_AVAI:
-        return evaluate_cy(
-            distmat, q_pids, g_pids, q_camids, g_camids, max_rank,
-            use_metric_cuhk03
-        )
-    else:
-        return evaluate_py(
-            distmat, q_pids, g_pids, q_camids, g_camids, max_rank,
-            use_metric_cuhk03
-        )
+    # embed()
+    # if use_cython and IS_CYTHON_AVAI:
+    #     print("q_pids dtype:", q_pids.dtype) # int32
+    #     print("g_pids dtype:", g_pids.dtype) # int32
+    #     print("q_camids dtype:", q_camids.dtype) # int64
+    #     print("g_camids dtype:", g_camids.dtype) # int64
+    #     print("distmat dtype:", distmat.dtype)  # float32
+    #     print("max_rank dtype:", type(max_rank))    # int
+
+
+    #     return evaluate_cy(
+    #         distmat, q_pids, g_pids, q_camids, g_camids, max_rank,
+    #         use_metric_cuhk03
+    #     )
+    # else:
+    return evaluate_py(
+        distmat, q_pids, g_pids, q_camids, g_camids, max_rank,
+        use_metric_cuhk03
+    )

@@ -16,7 +16,7 @@ from tqdm import tqdm
 
 class IncrementalSamples4cuhksysu(IncrementalPersonReIDSamples):
     '''
-    Duke dataset
+    Cuhksysu dataset
     '''
     def __init__(self, datasets_root, relabel=True, combineall=False):
         self.relabel = relabel
@@ -304,7 +304,7 @@ class IncrementalSamples4subcuhksysu(IncrementalPersonReIDSamples):
                     one_img = Image.open(image_path)
                     one_img_copy = copy.deepcopy(one_img)
                     box_tuple = tuple(box.round())
-                    box_tuple = map(int, box_tuple)
+                    box_tuple = tuple(map(int, box_tuple))
                     filled_pid = str(pid).zfill(5)
                     is_hard = str(is_hard)
                     cropped = one_img_copy.crop(box_tuple)

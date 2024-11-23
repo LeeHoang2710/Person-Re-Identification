@@ -8,6 +8,8 @@ from pkd.evaluation import accuracy
 from pkd.utils import set_bn_to_train, set_bn_to_eval, MultiItemAverageMeter
 from pkd.losses import *
 from pkd.visualization import featuremaps2heatmaps
+from tqdm import tqdm
+from IPython import embed
 
 
 def generate_patch_features(x, theta):
@@ -26,7 +28,7 @@ def train_p_s_an_epoch(config, base, loader, current_step, old_model, current_ep
     grad_scaler = GradScaler() if config.fp_16 else None
     k = base.model_dict['patchnet'].K
     # we assume 200 iterations as an epoch
-    for _ in range(config.steps):
+    for _ in tqdm(range(config.steps)):
         with autocast(config.fp_16):
             base.set_model_and_optimizer_zero_grad()
             # load a batch data

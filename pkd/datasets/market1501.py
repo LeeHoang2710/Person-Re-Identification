@@ -12,7 +12,7 @@ class IncrementalSamples4market(IncrementalPersonReIDSamples):
     Market Dataset
     '''
     _junk_pids = [0, -1]
-    dataset_dir = 'market1501'
+    dataset_dir = 'market1501/Market-1501-v15.09.15'
     dataset_url = 'http://188.138.127.15:81/Datasets/Market-1501-v15.09.15.zip'
     def __init__(self, datasets_root, relabel=True, combineall=False):
         self.relabel = relabel
@@ -105,6 +105,11 @@ class Market1501(IncrementalPersonReIDSamples):
         train = self.process_dir(self.train_dir, relabel=True)
         query = self.process_dir(self.query_dir, relabel=False)
         gallery = self.process_dir(self.gallery_dir, relabel=False)
+        # Debug prints to verify dataset loading
+        print("Train samples:", len(train))
+        print("Query samples:", len(query))
+        print("Gallery samples:", len(gallery))
+
         if self.market1501_500k:
             gallery += self.process_dir(self.extra_gallery_dir, relabel=False)
 

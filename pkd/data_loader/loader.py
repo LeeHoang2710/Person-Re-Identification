@@ -3,6 +3,7 @@ sys.path.append('..')
 
 import torch.utils.data as data
 import random
+from IPython import embed
 
 
 class ClassUniformlySampler(data.sampler.Sampler):
@@ -233,6 +234,7 @@ class IterLoader:
 
     def next_one(self):
         try:
+            # embed()
             return next(self.iter)
         except:
             self.iter = iter(self.loader)

@@ -34,10 +34,10 @@ class ReIDEvaluator:
     def evaluate(self, query_features, query_camids, query_pids, gallery_features, gallery_camids, gallery_pids):
 
         '''compute distance matrix'''
-        if self.dist is 'cosine':
+        if self.dist == 'cosine':
             scores = self.cosine_dist(query_features, gallery_features)
             rank_results = np.argsort(scores)[:, ::-1]
-        elif self.dist is 'euclidean':
+        elif self.dist == 'euclidean':
             scores = self.euclidean_dist(query_features, gallery_features)
             rank_results = np.argsort(scores)
 
@@ -142,9 +142,9 @@ class PrecisionRecall(ReIDEvaluator):
     def evaluate(self, thresholds, query_features, query_camids, query_pids, gallery_features, gallery_camids, gallery_pids):
 
         '''compute distance matrix'''
-        if self.dist is 'cosine':
+        if self.dist == 'cosine':
             scores = self.cosine_dist(query_features, gallery_features)
-        elif self.dist is 'euclidean':
+        elif self.dist == 'euclidean':
             scores = self.euclidean_dist(query_features, gallery_features)
 
         pid_similarity = (np.expand_dims(query_pids, axis=0).transpose([1,0]) == np.expand_dims(gallery_pids, axis=0)).astype(np.float)

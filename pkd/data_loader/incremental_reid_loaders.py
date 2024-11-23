@@ -56,7 +56,7 @@ class IncrementalReIDLoaders:
 
         self.use_local_label4validation = self.config.use_local_label4validation
 
-        self.total_step = len(self.config.train_dataset)
+        self.total_step = len(self.config.train_dataset) # only use market1501 --> 1
 
         # load
         self._load()
@@ -85,7 +85,7 @@ class IncrementalReIDLoaders:
         total_pid_list, total_cid_list = [], []
         temp_dict = copy.deepcopy(self.global_pids_per_step_dict)
         for step_index, pid_per_step in self.global_pids_per_step_dict.items():
-            if self.config.num_identities_per_domain is -1:
+            if self.config.num_identities_per_domain == -1:
                 one_step_pid_list = sorted(list(pid_per_step))
             else:
                 one_step_pid_list = sorted(list(pid_per_step))[0:self.config.num_identities_per_domain]
