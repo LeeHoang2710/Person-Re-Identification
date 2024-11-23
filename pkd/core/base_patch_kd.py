@@ -206,14 +206,6 @@ class BasePatchKD(object):
                 module.load_state_dict(torch.load(model_path), strict=False)
             except:
                 print(('Fail resume model from {}'.format(model_path)))
-                # print out the error that prevents model from loading
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                if exc_type == FileNotFoundError:
-                    print(f'FileNotFoundError: {model_path} not found!')
-                elif exc_type == RuntimeError:
-                    print(f'RuntimeError: {exc_value}')
-                else:
-                    print(f'Error: {exc_value}')
                 pass
             else:
                 print(('Successfully resume model from {}'.format(model_path)))
@@ -225,13 +217,8 @@ class BasePatchKD(object):
             else:
                 model_path = os.path.join(self.resume_train_dir, 'models', resume_step, f'optimizer_{optimizer_name}_{resume_epoch}.pkl')
             try:
-                optimizer.load_state_dict(torch.load(model_path), strict=False)
+                optimizer.load_state_dict(torch.load(model_path))
             except:
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                if exc_type == FileNotFoundError:
-                    print(f'FileNotFoundError: {model_path} not found!')
-                elif exc_type == RuntimeError:
-                    print(f'RuntimeError: {exc_value}')
                 print(('Fail resume optimizer from {}'.format(model_path)))
                 pass
             else:
@@ -243,7 +230,7 @@ class BasePatchKD(object):
         # print(('successfully resume model from {}'.format(model_path)))
         '''resume model from resume_epoch'''
         for module_name, module in self.model_dict.items():
-            model_path = os.path.join(models_dir, f'model_{module_name}_10.pkl')
+            model_path = os.path.join(models_dir, f'model_{module_name}_4.pkl')
             state_dict = torch.load(model_path)
             model_dict = module.state_dict()
             new_state_dict = OrderedDict()
