@@ -28,3 +28,7 @@ MANIFEST
 
 /.idea/
 .DS_Store
+market1501/
+data/
+results/
+venv/
