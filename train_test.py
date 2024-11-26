@@ -191,7 +191,7 @@ if __name__ == '__main__':
     # resume and save
     parser.add_argument('--auto_resume_training_from_lastest_steps', type=ast.literal_eval, default=True)
     parser.add_argument('--max_save_model_num', type=int, default=1, help='0 for max num is infinit')
-    parser.add_argument('--resume_train_dir', type=str, default='results/2024-11-23-21-08-51',
+    parser.add_argument('--resume_train_dir', type=str, default='',
                         help='directory to resume training. "" stands for output_path')
 
     # test

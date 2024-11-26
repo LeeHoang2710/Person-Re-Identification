@@ -3,6 +3,8 @@ import os.path as osp
 
 from pkd.data.datasets import ImageDataset
 from pkd.data_loader.incremental_datasets import IncrementalPersonReIDSamples
+import glob
+import re
 # Log
 # 22.01.2019
 # - add v2
@@ -32,54 +34,81 @@ class IncrementalSamples4msmt17(IncrementalPersonReIDSamples):
 
         self.dataset_dir = osp.join(datasets_root, self.dataset_dir)
 
-        has_main_dir = False
-        for main_dir in VERSION_DICT:
-            if osp.exists(osp.join(self.dataset_dir, main_dir)):
-                train_dir = VERSION_DICT[main_dir][TRAIN_DIR_KEY]
-                test_dir = VERSION_DICT[main_dir][TEST_DIR_KEY]
-                has_main_dir = True
-                break
-        assert has_main_dir, 'Dataset folder not found'
+        # has_main_dir = False
+        # for main_dir in VERSION_DICT:
+        #     if osp.exists(osp.join(self.dataset_dir, main_dir)):
+        #         train_dir = VERSION_DICT[main_dir][TRAIN_DIR_KEY]
+        #         test_dir = VERSION_DICT[main_dir][TEST_DIR_KEY]
+        #         has_main_dir = True
+        #         break
+        # assert has_main_dir, 'Dataset folder not found'
+        train_dir = 'bounding_box_train'
+        test_dir = 'bounding_box_test'
+        query_dir = 'query'
 
-        self.train_dir = osp.join(self.dataset_dir, main_dir, train_dir)
-        self.test_dir = osp.join(self.dataset_dir, main_dir, test_dir)
-        self.list_train_path = osp.join(
-            self.dataset_dir, main_dir, 'list_train.txt'
-        )
-        self.list_val_path = osp.join(
-            self.dataset_dir, main_dir, 'list_val.txt'
-        )
-        self.list_query_path = osp.join(
-            self.dataset_dir, main_dir, 'list_query.txt'
-        )
-        self.list_gallery_path = osp.join(
-            self.dataset_dir, main_dir, 'list_gallery.txt'
-        )
+        self.train_dir = osp.join(self.dataset_dir, train_dir)
+        self.test_dir = osp.join(self.dataset_dir, test_dir)
+        self.query_dir = osp.join(self.dataset_dir, query_dir)
+        # self.list_train_path = osp.join(
+        #     self.dataset_dir, 'list_train.txt'
+        # )
+        # self.list_val_path = osp.join(
+        #     self.dataset_dir, 'list_val.txt'
+        # )
+        # self.list_query_path = osp.join(
+        #     self.dataset_dir, 'list_query.txt'
+        # )
+        # self.list_gallery_path = osp.join(
+        #     self.dataset_dir, 'list_gallery.txt'
+        # )
 
-        train = self.process_dir(self.train_dir, self.list_train_path)
-        val = self.process_dir(self.train_dir, self.list_val_path)
-        query = self.process_dir(self.test_dir, self.list_query_path)
-        gallery = self.process_dir(self.test_dir, self.list_gallery_path)
+        # train = self.process_dir(self.train_dir, self.list_train_path)
+        # val = self.process_dir(self.train_dir, self.list_val_path)
+        # query = self.process_dir(self.test_dir, self.list_query_path)
+        # gallery = self.process_dir(self.test_dir, self.list_gallery_path)
+        train = self.process_dir(self.train_dir, relabel=True)
+        query = self.process_dir(self.query_dir, relabel=False)
+        gallery = self.process_dir(self.test_dir, relabel=False)
 
         # Note: to fairly compare with published methods on the conventional ReID setting,
         #       do not add val images to the training set.
-        if self.combineall:
-            train += val
+        # if self.combineall:
+        #     train += val
         self.train, self.query, self.gallery = train, query, gallery
         self._show_info(self.train, self.query, self.gallery)
 
-    def process_dir(self, dir_path, list_path):
-        with open(list_path, 'r') as txt:
-            lines = txt.readlines()
+    # def process_dir(self, dir_path, list_path):
+    #     with open(list_path, 'r') as txt:
+    #         lines = txt.readlines()
+
+    #     data = []
+
+    #     for img_idx, img_info in enumerate(lines):
+    #         img_path, pid = img_info.split(' ')
+    #         pid = int(pid)  # no need to relabel
+    #         camid = int(img_path.split('_')[2]) - 1  # index starts from 0
+    #         img_path = osp.join(dir_path, img_path)
+    #         data.append((img_path, pid, camid, 'msmt17', pid))
+
+    #     return data
+    def process_dir(self, dir_path, relabel=False):
+        img_paths = sorted(glob.glob(osp.join(dir_path, '*.jpg')))
+        pattern = re.compile(r'([-\d]+)_c(\d)')
+
+        pid_container = set()
+        for img_path in img_paths:
+            pid, _ = map(int, pattern.search(img_path).groups())
+            pid_container.add(pid)
+        pid2label = {pid: label for label, pid in enumerate(pid_container)}
 
         data = []
-
-        for img_idx, img_info in enumerate(lines):
-            img_path, pid = img_info.split(' ')
-            pid = int(pid)  # no need to relabel
-            camid = int(img_path.split('_')[2]) - 1  # index starts from 0
-            img_path = osp.join(dir_path, img_path)
-            data.append((img_path, pid, camid, 'msmt17', pid))
+        for img_path in img_paths:
+            pid, camid = map(int, pattern.search(img_path).groups())
+            # assert 1 <= camid <= 8
+            camid -= 1  # index starts from 0
+            if relabel:
+                pid = pid2label[pid]
+            data.append([img_path, pid, camid, 'msmt17', pid])
 
         return data
 
