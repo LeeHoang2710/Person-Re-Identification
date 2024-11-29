@@ -230,7 +230,7 @@ class BasePatchKD(object):
         # print(('successfully resume model from {}'.format(model_path)))
         '''resume model from resume_epoch'''
         for module_name, module in self.model_dict.items():
-            model_path = os.path.join(models_dir, f'model_{module_name}_40.pkl')
+            model_path = os.path.join(models_dir, f'model_{module_name}_2.pkl')
             state_dict = torch.load(model_path)
             model_dict = module.state_dict()
             new_state_dict = OrderedDict()

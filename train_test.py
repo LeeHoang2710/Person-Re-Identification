@@ -40,7 +40,7 @@ def main(config):
         for current_step in (range(start_train_step, loaders.total_step)):
             current_total_train_epochs = config.total_continual_train_epochs if current_step > 0 else config.total_train_epochs
             print('Total epoch for current step:', current_total_train_epochs)
-            start_train_epoch = 0 if current_step > 0 else start_train_epoch
+            # start_train_epoch = 0 if current_step > 0 else start_train_epoch
             print('Start training from epoch:', start_train_epoch)
             if current_step > 0:
                 logger(f'save_and_frozen old model in {current_step}')
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     # dataset: market, cuhksysu, duke, msmt17, cuhk03
 
     parser.add_argument('--image_size', type=int, nargs='+', default=[256, 128])
-    parser.add_argument('--test_batch_size', type=int, default=64, help='test batch size')
+    parser.add_argument('--test_batch_size', type=int, default=32, help='test batch size')
     parser.add_argument('--p', type=int, default=32, help='person count in a batch')
     parser.add_argument('--k', type=int, default=4, help='images count of a person in a batch')
     parser.add_argument('--use_local_label4validation', type=bool, default=True,
@@ -211,7 +211,7 @@ if __name__ == '__main__':
                         default=True,
                         help='test during train for forgeting')
 
-    parser.add_argument('--resume_test_model', type=str, default='results/2024-11-29-11-46-27/models/1',
+    parser.add_argument('--resume_test_model', type=str, default='results/2024-11-29-22-03-38/models/1',
                         help='only available under test model')
     parser.add_argument('--test_mode', type=str, default='all', help='inter-camera, intra-camera, all')
     parser.add_argument('--test_metric', type=str, default='euclidean', help='cosine, euclidean')
