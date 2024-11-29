@@ -2,6 +2,8 @@ import numpy as np
 import os.path as osp
 import shutil
 from PIL import Image, ImageOps, ImageDraw
+from IPython import embed
+from tqdm import tqdm
 
 from pkd.utils import make_dirs
 
@@ -70,7 +72,7 @@ def visualize_ranked_results2(distmat, dataset, save_dir='', topk=20):
     print("Done")
 
 
-def visualize_ranked_results(distmat, dataset, save_dir='', topk=20, sort='descend', mode='inter-camera', only_show=None):
+def visualize_ranked_results(distmat, dataset, save_dir='', topk=20, sort='ascend', mode='inter-camera', only_show=None):
     """Visualizes ranked results.
     Args:
         dismat (numpy.ndarray): distance matrix of shape (nq, ng)
@@ -106,14 +108,18 @@ def visualize_ranked_results(distmat, dataset, save_dir='', topk=20, sort='desce
     def cat_imgs_to(image_list, hit_list, text_list, target_dir):
 
         images = []
-        for img, hit, text in zip(image_list, hit_list, text_list):
+        corrected = 0
+        incorrected = 0
+        for img, hit, text in (zip(image_list, hit_list, text_list)):
             img = Image.open(img).resize((64, 128))
             d = ImageDraw.Draw(img)
             d.text((3, 1), "{:.3}".format(text), fill=(255, 255, 0))
             if hit:
                 img = ImageOps.expand(img, border=4, fill='green')
+                corrected += 1
             else:
                 img = ImageOps.expand(img, border=4, fill='red')
+                incorrected += 1
             images.append(img)
 
         widths, heights = zip(*(i.size for i in images))
@@ -126,16 +132,17 @@ def visualize_ranked_results(distmat, dataset, save_dir='', topk=20, sort='desce
             x_offset += im.size[0]
 
         new_im.save(target_dir)
+        # print("Corrected: {}, Incorrected: {}".format(corrected, incorrected))
 
     counts = 0
-    for q_idx in range(num_q):
+    for q_idx in tqdm(range(num_q)):
 
         image_list = []
         hit_list = []
         text_list = []
 
         # query image
-        qimg_path, qpid, qcamid = query[q_idx]
+        qimg_path, qpid, qcamid = query[q_idx][0:3]
         image_list.append(qimg_path)
         hit_list.append(True)
         text_list.append(0.0)
@@ -149,7 +156,7 @@ def visualize_ranked_results(distmat, dataset, save_dir='', topk=20, sort='desce
         # matched images
         rank_idx = 1
         for ii, g_idx in enumerate(indices[q_idx, :]):
-            gimg_path, gpid, gcamid = gallery[g_idx]
+            gimg_path, gpid, gcamid = gallery[g_idx][0:3]
             if mode == 'intra-camera':
                 valid = qcamid == gcamid
             elif mode == 'inter-camera':
@@ -168,4 +175,4 @@ def visualize_ranked_results(distmat, dataset, save_dir='', topk=20, sort='desce
 
         counts += 1
         cat_imgs_to(image_list, hit_list, text_list, qdir)
-        print(counts, qdir)
+        # print(counts, qdir)

@@ -23,6 +23,11 @@ class IncrementalReIDLoaders:
     def __init__(self, config):
         self.config = config
 
+        self.market_query_samples = None
+        self.market_gallery_samples = None
+        self.market_query_loader = None
+        self.market_gallery_loader = None
+
         # resize --> flip --> pad+crop --> colorjitor(optional) --> totensor+norm --> rea (optional)
         transform_train = [
             transforms.Resize(self.config.image_size, interpolation=3),
@@ -128,6 +133,12 @@ class IncrementalReIDLoaders:
                                                    self.config.test_batch_size)
             self.test_loader_dict[one_test_dataset].append(temp_query_loader)
             self.test_loader_dict[one_test_dataset].append(temp_gallery_loader)
+
+            if one_test_dataset == 'market':
+                self.market_query_samples = temp_query_samples
+                self.market_gallery_samples = temp_gallery_samples
+                self.market_query_loader = temp_query_loader
+                self.market_gallery_loader = temp_gallery_loader
 
 
         IncrementalPersonReIDSamples._show_info(None, train_samples, query_sample, gallery_sample,
