@@ -40,7 +40,7 @@ def main(config):
         for current_step in (range(start_train_step, loaders.total_step)):
             current_total_train_epochs = config.total_continual_train_epochs if current_step > 0 else config.total_train_epochs
             print('Total epoch for current step:', current_total_train_epochs)
-            start_train_epoch = 0 if current_step > 0 else start_train_epoch
+            # start_train_epoch = 0 if current_step > 0 else start_train_epoch
             print('Start training from epoch:', start_train_epoch)
             if current_step > 0:
                 logger(f'save_and_frozen old model in {current_step}')
@@ -56,13 +56,13 @@ def main(config):
                 str_lr, dict_lr = base.get_current_learning_rate()
                 logger(str_lr)
                 results = train_p_s_an_epoch(config, base, loaders, current_step, old_model, current_epoch, output_featuremaps=config.output_featuremaps)
-                print("Result: ", len(results))
+                # print("Result: ", len(results))
 
                 if config.output_featuremaps and len(results) == 3:
                     results_dict, results_str, heatmaps = results
                     if config.visdom:
                         visdom_dict['feature_maps'].images(heatmaps)
-                        print("Visdom result" , results)
+                        # print("Visdom result" , results)
                 else:
                     results_dict, results_str = results
                 logger('Time: {};  Step: {}; Epoch: {};  {}'.format(time_now(), current_step, current_epoch, results_str))
@@ -158,12 +158,12 @@ if __name__ == '__main__':
     parser.add_argument('--train_dataset', nargs='+', type=str,
                         default=['market', 'cuhksysu'])
     parser.add_argument('--test_dataset', nargs='+', type=str,
-                        default=['market', 'cuhksysu'])
+                        default=['market'])
     # dataset: market, cuhksysu, duke, msmt17, cuhk03
 
     parser.add_argument('--image_size', type=int, nargs='+', default=[256, 128])
-    parser.add_argument('--test_batch_size', type=int, default=64, help='test batch size')
-    parser.add_argument('--p', type=int, default=32, help='person count in a batch')
+    parser.add_argument('--test_batch_size', type=int, default=32, help='test batch size')
+    parser.add_argument('--p', type=int, default=16, help='person count in a batch')
     parser.add_argument('--k', type=int, default=4, help='images count of a person in a batch')
     parser.add_argument('--use_local_label4validation', type=bool, default=True,
                         help='validation use global pid label or not')
@@ -197,7 +197,7 @@ if __name__ == '__main__':
     # resume and save
     parser.add_argument('--auto_resume_training_from_lastest_steps', type=ast.literal_eval, default=True)
     parser.add_argument('--max_save_model_num', type=int, default=1, help='0 for max num is infinit')
-    parser.add_argument('--resume_train_dir', type=str, default='results/2024-11-29-11-46-27',
+    parser.add_argument('--resume_train_dir', type=str, default='results/2024-11-30-16-16-55',
                         help='directory to resume training. "" stands for output_path')
 
     # test
