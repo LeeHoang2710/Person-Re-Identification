@@ -211,7 +211,7 @@ if __name__ == '__main__':
                         default=True,
                         help='test during train for forgeting')
 
-    parser.add_argument('--resume_test_model', type=str, default='results/2024-11-29-11-46-27/models/1',
+    parser.add_argument('--resume_test_model', type=str, default='results/2024-11-29-22-03-38/models/1',
                         help='only available under test model')
     parser.add_argument('--test_mode', type=str, default='all', help='inter-camera, intra-camera, all')
     parser.add_argument('--test_metric', type=str, default='euclidean', help='cosine, euclidean')
